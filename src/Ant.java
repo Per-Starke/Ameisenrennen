@@ -73,6 +73,7 @@ public class Ant implements Runnable {
          this.x = x;
          this.y = y;
          this.stepCount++;
+         fields.getField(x, y).setValue(stepCount);
       }
    }
 
