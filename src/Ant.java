@@ -1,9 +1,11 @@
 package src;
 
+import java.util.ArrayList;
+
 /**
  * An {@code Ant} is created at a specific position of an {@link AntField} with
  * an initial {@code stepCount}. When running an Ant, it will lookup the values
- * on the current and all surrounding {@link Field}
+ * on the current and all surrounding {@link AntField}
  * (Moore-neighborhood) instances and test if the position is free, i.e. has a
  * value of {@code 0}, or if the value is greater than the {@code stepCount} of
  * this Ant. For both cases, the Ant will set the value of the {@code Field} at
@@ -67,9 +69,11 @@ public class Ant implements Runnable {
     * @param y the new y-pos
     */
    public void setPos(int x, int y){
-      this.x = x;
-      this.y = y;
-      this.stepCount++;
+      synchronized(this.getClass()){
+         this.x = x;
+         this.y = y;
+         this.stepCount++;
+      }
    }
 
    /**
@@ -91,8 +95,8 @@ public class Ant implements Runnable {
       /*
       Use the get_neighbors method on the current position here, once implemented!
        */
-      int[][] neighbors = {{2,5}, {3,4}, {3,5}};
-
+      //int[][] neighbors = {{2,5}, {3,4}, {3,5}};
+     ArrayList<FieldCoordinate> neighbors =  fields.mooreNeighbours( this.x, this.y );
      /*
      Three cases:
      1) Neighbors is empty: Stop
@@ -101,14 +105,14 @@ public class Ant implements Runnable {
      The last 2 cases can be treated in one
       */
 
-      int neighborsLength = neighbors.length;
+      int neighborsLength = neighbors.size();
 
       // Case: Neighbors is empty, then this ant stops and is finished. We can leave this blank, as we do nothing!
 
       // Case: Neighbors_length is >=1: Move to first neighbor, start new ants for all others
       if (neighborsLength >= 1){
-         int x = neighbors[0][0];
-         int y = neighbors[0][1];
+         int x = neighbors.get(0).getX();
+         int y = neighbors.get(0).getY();
 
          if(checkField(x, y)){
             this.setPos(x, y);
@@ -117,8 +121,8 @@ public class Ant implements Runnable {
 
          // Iterate through all others neighbors and start new ant-threads
          for(int i=1; i<neighborsLength; i++){
-            x = neighbors[i][0];
-            y = neighbors[i][1];
+            x = neighbors.get(i).getX();
+            y = neighbors.get(i).getY();
 
             if(checkField(x, y)){
                Ant ant = new Ant(this.fields, x, y, this.stepCount);

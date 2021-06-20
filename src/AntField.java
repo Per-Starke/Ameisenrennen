@@ -117,7 +117,7 @@ public class AntField {
       if (isInField( x-1, y)) neighboursFound.add( new FieldCoordinate(x-1, y));
 
       // try E
-      if (isInField( x+1, y)) neighboursFound.add( new FieldCoordinate(x-1, y));
+      if (isInField( x+1, y)) neighboursFound.add( new FieldCoordinate(x+1, y));
 
       // try SW
       if (isInField( x-1, y+1)) neighboursFound.add( new FieldCoordinate(x-1, y+1));
@@ -133,7 +133,6 @@ public class AntField {
 
    private boolean isInField( int x, int y) {
       return getField(x, y) != null;
-
    }
 
 

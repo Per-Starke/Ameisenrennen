@@ -4,9 +4,9 @@ public class AntRace implements AntFields {
 
 	public static void main(String[] args) {
 
-		AntField field = new AntField(FIELD4);
+		AntField field = new AntField(FIELD9);
 
-		Ant ant = new Ant(field, 2, 4, 1);
+		Ant ant = new Ant(field, 0, 0, 1);
 
 		Thread thread = new Thread(ant);
 
