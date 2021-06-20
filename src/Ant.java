@@ -14,141 +14,162 @@ import java.util.ArrayList;
  * an incremented {@code stepCount} to visit the other available {@code Field}
  * elements. The Ant will run until it finds no more {@code Field} elements in
  * its neighborhood to be altered.
- * 
+ *
  * @author Mathias Menninghaus (mathias.menninghaus@uos.de)
- * 
  */
 public class Ant implements Runnable {
 
-   /**
-    * The fields / world this ant is s
-    */
-   private AntField fields;
+    /**
+     * The fields / world this ant is s
+     */
+    private AntField fields;
 
-   /**
-    * The x and y position of this ant in the fields / world
-    */
-   private int x;
-   private int y;
+    /**
+     * The x and y position of this ant in the fields / world
+     */
+    private int x;
+    private int y;
 
-   /**
-    * The step-count of this ant
-    */
-   private int stepCount;
+    private int startX;
+    private int startY;
 
-   /**
-    * 
-    * @param fields
-    *           the {@code AntField} on which this {@code Ant} operates
-    * @param x
-    *           x-axis value of the starting position
-    * @param y
-    *           y-axis value of the starting position
-    * @param stepCount
-    *           initial stepCount of this {@code Ant}.
-    * 
-    * @throws IllegalArgumentException
-    *            If the {@code Field} at position {@code x,y} does not exist, or
-    *            if its value is < 0
-    */
-   public Ant(AntField fields, int x, int y, int stepCount) {
-      this.fields = fields;
-      this.x = x;
-      this.y = y;
-      this.stepCount = stepCount;
+    /**
+     * The step-count of this ant
+     */
+    private int stepCount;
 
-      // Set the stepCount on the current field on this.stepCount
-      this.fields.getField(this.x, this.y).setValue(this.stepCount);
-   
-   }
+    /**
+     * The current neighbour fields of this ant
+     */
+    private ArrayList<FieldCoordinate> neighbors;
 
-   /**
-    * Set the position of this ant to a new position.
-    * Automatically add 1 to this stepCount
-    * @param x the new x-pos
-    * @param y the new y-pos
-    */
-   public void setPos(int x, int y){
-      synchronized(this.getClass()){
-         this.x = x;
-         this.y = y;
-         this.stepCount++;
-         fields.getField(x, y).setValue(stepCount);
-      }
-   }
+    /**
+     * @param fields    the {@code AntField} on which this {@code Ant} operates
+     * @param x         x-axis value of the starting position
+     * @param y         y-axis value of the starting position
+     * @param stepCount initial stepCount of this {@code Ant}.
+     * @throws IllegalArgumentException If the {@code Field} at position {@code x,y} does not exist, or
+     *                                  if its value is < 0
+     */
+    public Ant(AntField fields, int x, int y, int stepCount) {
+        this.fields = fields;
+        this.x = x;
+        this.y = y;
+        this.stepCount = stepCount;
 
-   /**
-    * Check whether the field at the given position is free or its stepCount is greater than the one of this ant
-    * @param x the x pos of the field to check
-    * @param y the y pos of the field to check
-    * @return True if field is free or has greater value than this.stepCount, False otherwise
-    */
-   public boolean checkField(int x, int y){
-      int value = fields.getField(x, y).getValue();
+        this.startX = x;
+        this.startY = y;
 
-      return (value==0 || value>this.stepCount+1);
-   }
+        // Set the stepCount on the current field on this.stepCount
+        this.fields.getField(this.x, this.y).setValue(this.stepCount);
 
-   /**
-    * Single iteration of finding + moving to neighbors
-    */
-   public void oneRun(){
-      /*
-      Use the get_neighbors method on the current position here, once implemented!
-       */
-      //int[][] neighbors = {{2,5}, {3,4}, {3,5}};
-     ArrayList<FieldCoordinate> neighbors =  fields.mooreNeighbours( this.x, this.y );
-     /*
-     Three cases:
-     1) Neighbors is empty: Stop
-     2) Neighbors is only 1 field: move there
-     3) Several neighbors: Move to one, start new Threads for the others
-     The last 2 cases can be treated in one
-      */
+    }
 
-      int neighborsLength = neighbors.size();
+    /**
+     * Set the position of this ant to a new position.
+     * Automatically add 1 to this stepCount
+     *
+     * @param x the new x-pos
+     * @param y the new y-pos
+     */
+    public void setPos(int x, int y) {
+        synchronized (this.getClass()) {
+            System.out.println("called by ant " + startX + ":" + startY);
+            this.x = x;
+            this.y = y;
+            this.stepCount++;
+            fields.getField(x, y).setValue(stepCount);
+        }
+    }
 
-      // Case: Neighbors is empty, then this ant stops and is finished. We can leave this blank, as we do nothing!
+    /**
+     * Check whether the field at the given position is free or its stepCount is greater than the one of this ant
+     *
+     * @param x the x pos of the field to check
+     * @param y the y pos of the field to check
+     * @return True if field is free or has greater value than this.stepCount, False otherwise
+     */
+    public synchronized boolean checkField(int x, int y) {
+        int value = fields.getField(x, y).getValue();
 
-      // Case: Neighbors_length is >=1: Move to first neighbor, start new ants for all others
-      if (neighborsLength >= 1){
-         int neighbourX = neighbors.get(0).getX();
-         int neighbourY = neighbors.get(0).getY();
+        return (value == 0 || value > this.stepCount + 1);
+    }
 
-         // move THIS ant to first neighbour
-         if(checkField(neighbourX, neighbourY)){
-            this.setPos(neighbourX, neighbourY);
-            fields.getField(neighbourX, neighbourY).setValue(stepCount);
-         }
+    /**
+     * Is this ant finished or should it continue taking steps?
+     *
+     * @return True if this ant has no neighbors or all neighbors are "false" by the checkField method
+     */
+    private boolean finished() {
+        neighbors = fields.mooreNeighbours(this.x, this.y);
 
-         // Iterate through all others neighbors and start new ant-threads
-         for(int i=1; i<neighborsLength; i++){
-            neighbourX = neighbors.get(i).getX();
-            neighbourY = neighbors.get(i).getY();
+        boolean allNeighborsFalse = true;
+        for (int i = 0; i < neighbors.size(); i++) {
+            if (checkField(neighbors.get(i).getX(), neighbors.get(i).getY())) {
+                allNeighborsFalse = false;
+            }
+        }
 
-            if(checkField(neighbourX, neighbourY)){
-               Ant ant = new Ant(this.fields, neighbourX, neighbourY, this.stepCount);
-               Thread thread = new Thread(ant);
-               thread.start();
+        return allNeighborsFalse || neighbors.isEmpty();
+    }
+
+
+    /**
+     * Single iteration of finding + moving to neighbors
+     */
+    public void oneRun() {
+        // Case: Neighbors is empty, then this ant stops and is finished. We can leave this blank, as we do nothing!
+
+
+
+        // Case: Neighbors_length is >=1: Move to first neighbor, start new ants for all others
+        if (neighbors.size() >= 1) {
+            int neighbourX = neighbors.get(0).getX();
+            int neighbourY = neighbors.get(0).getY();
+
+            // move THIS ant to first neighbour
+            if (checkField(neighbourX, neighbourY)) {
+                this.setPos(neighbourX, neighbourY);
+            }
+
+            // Iterate through all others neighbors and start new ant-threads
+            for (int i = 1; i < neighbors.size(); i++) {
+                neighbourX = neighbors.get(i).getX();
+                neighbourY = neighbors.get(i).getY();
+
+                if (checkField(neighbourX, neighbourY)) {
+                    Ant ant = new Ant(this.fields, neighbourX, neighbourY, this.stepCount);
+                    Thread thread = new Thread(ant);
+                    thread.start();
 
 //               try {
 //                  thread.join();
 //               } catch (InterruptedException e) {
 //                  e.printStackTrace();
 //               }
+                }
             }
-         }
-      }
+        }
 
 
-   }
+    }
 
-   /**
-    * Run through the fields and find APSP
-    */
-   public void run() {
-      while()
-      this.oneRun();
-   }
+    private void antStatus() {
+        synchronized(this.getClass()) {
+            System.out.println("Ant " + startX + "/" + startY + ":" + neighbors.size() + " neighbours, current pos: " + x + "/" + y + " stepCount " + stepCount);
+            System.out.println( fields);
+        }
+    }
+
+    /**
+     * Run through the fields and find APSP
+     */
+    public void run() {
+        while (!finished()) {
+            // for debugging purpuses - print this ants' status
+            antStatus();
+            this.oneRun();
+        }
+    }
 
 }
