@@ -83,23 +83,15 @@ public class Ant implements Runnable {
 
       return (value==0 || value>this.stepCount+1);
    }
+
    /**
-    * Run through the fields and find APSP
+    * Single iteration of finding + moving to neighbors
     */
-   public void run() {
+   public void oneRun(){
       /*
       Use the get_neighbors method on the current position here, once implemented!
        */
-      int[][] neighbors = new int[9][2];
-      for (int i=0; i<9; i++){
-         int[] pos = new int[2];
-         if(fields.getField(2, i) != null){
-            pos[0] = 2;
-            pos[1] = i;
-         }
-
-         neighbors[i] = pos;
-      }
+      int[][] neighbors = {{2,5}, {3,4}, {3,5}};
 
      /*
      Three cases:
@@ -111,13 +103,10 @@ public class Ant implements Runnable {
 
       int neighborsLength = neighbors.length;
 
-      // Case: Neighbors is empty, then this ant stops and is finished
-      if(neighborsLength == 0){
-         return;
-      }
+      // Case: Neighbors is empty, then this ant stops and is finished. We can leave this blank, as we do nothing!
 
       // Case: Neighbors_length is >=1: Move to first neighbor, start new ants for all others
-      else if (neighborsLength >= 1){
+      if (neighborsLength >= 1){
          int x = neighbors[0][0];
          int y = neighbors[0][1];
 
@@ -135,12 +124,25 @@ public class Ant implements Runnable {
                Ant ant = new Ant(this.fields, x, y, this.stepCount);
                Thread thread = new Thread(ant);
                thread.start();
-               // Do we need any list or counter for the started Threads??
+
+//               try {
+//                  thread.join();
+//               } catch (InterruptedException e) {
+//                  e.printStackTrace();
+//               }
             }
          }
       }
 
 
+   }
+
+   /**
+    * Run through the fields and find APSP
+    */
+   public void run() {
+      // while has neighbors:
+      this.oneRun();
    }
 
 }
