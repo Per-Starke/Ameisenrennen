@@ -1,3 +1,5 @@
+package src;
+
 public class AntRace implements AntFields {
 
 	public static void main(String[] args) {
@@ -6,7 +8,16 @@ public class AntRace implements AntFields {
 
 		Ant ant = new Ant(field, 2, 4, 1);
 
-		new Thread(ant).start();
+		Thread thread = new Thread(ant);
+
+		thread.start();
+
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 
 		System.out.println(field.toString());
 	}
