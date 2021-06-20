@@ -93,8 +93,11 @@ public class Ant implements Runnable {
       int[][] neighbors = new int[9][2];
       for (int i=0; i<9; i++){
          int[] pos = new int[2];
-         pos[0] = 1;
-         pos[1] = 2;
+         if(fields.getField(2, i) != null){
+            pos[0] = 2;
+            pos[1] = i;
+         }
+
          neighbors[i] = pos;
       }
 
@@ -136,7 +139,6 @@ public class Ant implements Runnable {
             }
          }
       }
-
 
 
    }
