@@ -111,21 +111,22 @@ public class Ant implements Runnable {
 
       // Case: Neighbors_length is >=1: Move to first neighbor, start new ants for all others
       if (neighborsLength >= 1){
-         int x = neighbors.get(0).getX();
-         int y = neighbors.get(0).getY();
+         int neighbourX = neighbors.get(0).getX();
+         int neighbourY = neighbors.get(0).getY();
 
-         if(checkField(x, y)){
-            this.setPos(x, y);
-            fields.getField(x, y).setValue(stepCount);
+         // move THIS ant to first neighbour
+         if(checkField(neighbourX, neighbourY)){
+            this.setPos(neighbourX, neighbourY);
+            fields.getField(neighbourX, neighbourY).setValue(stepCount);
          }
 
          // Iterate through all others neighbors and start new ant-threads
          for(int i=1; i<neighborsLength; i++){
-            x = neighbors.get(i).getX();
-            y = neighbors.get(i).getY();
+            neighbourX = neighbors.get(i).getX();
+            neighbourY = neighbors.get(i).getY();
 
-            if(checkField(x, y)){
-               Ant ant = new Ant(this.fields, x, y, this.stepCount);
+            if(checkField(neighbourX, neighbourY)){
+               Ant ant = new Ant(this.fields, neighbourX, neighbourY, this.stepCount);
                Thread thread = new Thread(ant);
                thread.start();
 
@@ -145,7 +146,7 @@ public class Ant implements Runnable {
     * Run through the fields and find APSP
     */
    public void run() {
-      // while has neighbors:
+      while()
       this.oneRun();
    }
 
