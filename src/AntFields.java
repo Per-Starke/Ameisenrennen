@@ -62,6 +62,11 @@ public interface AntFields {
             {0, 0, 0 },
             {0, 0, 0 }};
 
+    public final int[][] FIELD10 = {
+            {0, 0, 0, 0},
+            {-1, -1, 0, 0 },
+            {0, 0, 0, 0 }};
+
 
 
 };

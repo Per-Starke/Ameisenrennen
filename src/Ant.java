@@ -62,6 +62,7 @@ public class Ant implements Runnable {
 
         // Set the stepCount on the current field on this.stepCount
         this.fields.getField(this.x, this.y).setValue(this.stepCount);
+        System.out.println("Field value set by ant" + this.x + ":" + this.y);
 
     }
 
@@ -138,7 +139,9 @@ public class Ant implements Runnable {
                 neighbourY = neighbors.get(i).getY();
 
                 if (checkField(neighbourX, neighbourY)) {
+                    System.out.println("New ant at neighbor" + neighbourX + ":" + neighbourY);
                     Ant ant = new Ant(this.fields, neighbourX, neighbourY, this.stepCount);
+                    ant.walk();
                     Thread thread = new Thread(ant);
                     thread.start();
 
@@ -152,6 +155,10 @@ public class Ant implements Runnable {
         }
 
 
+    }
+
+    private void walk(){
+        this.stepCount++;
     }
 
     private void antStatus() {

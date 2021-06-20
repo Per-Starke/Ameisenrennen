@@ -87,7 +87,7 @@ public class AntField {
      * @param y
      * @return the moore-neighbours of this field
      */
-    public ArrayList<FieldCoordinate> mooreNeighbours(int x, int y) {
+    public ArrayList<FieldCoordinate> mooreNeighbours(int x, int y, int stepCount) {
         ArrayList<FieldCoordinate> neighboursFound = new ArrayList<>();
 
         // P is our current positition
