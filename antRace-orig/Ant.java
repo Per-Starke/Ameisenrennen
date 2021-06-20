@@ -41,10 +41,6 @@ public class Ant implements Runnable {
    }
 
    public void run() {
-      // Three cases:
-      // Neighbors are empty
-      // One neighbor
-      // Multiple neighborsz65
       
    }
 

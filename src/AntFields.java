@@ -1,3 +1,5 @@
+package src;
+
 public interface AntFields {
 
 	// modifier public is redundant for interface fields

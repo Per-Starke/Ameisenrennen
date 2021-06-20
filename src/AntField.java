@@ -1,3 +1,5 @@
+package src;
+
 /**
  * The complete world on which the {@code Ant} instances in an {@code AntRace}
  * operate. Consists of a 2 dimensional Array of {@link Field}

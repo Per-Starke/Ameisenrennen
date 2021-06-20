@@ -1,3 +1,5 @@
+package src;
+
 public class AntRace implements AntFields {
 
 	public static void main(String[] args) {

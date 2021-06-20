@@ -1,3 +1,5 @@
+package src;
+
 /**
  * solution to the _all pairs shortest path_ problem,
  * using concurrent ants.
@@ -9,6 +11,7 @@
 *
  *
  */
+
 public class APSPSolver {
 
     public static void main(String[] args) {
