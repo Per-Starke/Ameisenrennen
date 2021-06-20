@@ -73,6 +73,7 @@ public class Ant implements Runnable {
          this.x = x;
          this.y = y;
          this.stepCount++;
+         fields.getField(x, y).setValue(stepCount);
       }
    }
 
@@ -116,7 +117,6 @@ public class Ant implements Runnable {
 
          if(checkField(x, y)){
             this.setPos(x, y);
-            fields.getField(x, y).setValue(stepCount);
          }
 
          // Iterate through all others neighbors and start new ant-threads
@@ -145,7 +145,6 @@ public class Ant implements Runnable {
     * Run through the fields and find APSP
     */
    public void run() {
-      // while has neighbors:
       this.oneRun();
    }
 
