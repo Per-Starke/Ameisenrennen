@@ -1,5 +1,7 @@
 package src;
 
+import java.util.ArrayList;
+
 /**
  * The complete world on which the {@code Ant} instances in an {@code AntRace}
  * operate. Consists of a 2 dimensional Array of {@link Field}
@@ -82,6 +84,58 @@ public class AntField {
       } else
          return this.fields[x][y];
    }
+
+   /**
+    * Returns a list of neighbours of the field at {@code x}, {@code y}.
+    * A field is a neighbour if it is >= 0.
+    * We blindly try all 8 possible fields - using the {@see isInField(newX, newY)} method.
+    *
+    * @param x
+    *          x-axis value of
+    * @param y
+    * @return the moore-neighbours of this field
+    */
+   public ArrayList<FieldCoordinate>  mooreNeighbours( int x, int y) {
+      ArrayList<FieldCoordinate> neighboursFound = new ArrayList<>();
+
+      // P is our current positition
+      //        0 | 1 |  2
+      //  0 |  NW | N | NE
+      //  1 |   W | P |  E
+      //  2 |  SW | S | SE
+
+      // try NW (x-1, y-1)
+      if (isInField( x-1, y-1)) neighboursFound.add( new FieldCoordinate(x-1, y-1));
+
+      // try N (x, y-1)
+      if (isInField( x, y-1)) neighboursFound.add( new FieldCoordinate(x, y-1));
+
+      // try NE (x+1, y-1)
+      if (isInField( x+1, y-1)) neighboursFound.add( new FieldCoordinate(x+1, y-1));
+
+      // try W
+      if (isInField( x-1, y)) neighboursFound.add( new FieldCoordinate(x-1, y));
+
+      // try E
+      if (isInField( x+1, y)) neighboursFound.add( new FieldCoordinate(x-1, y));
+
+      // try SW
+      if (isInField( x-1, y+1)) neighboursFound.add( new FieldCoordinate(x-1, y+1));
+
+      // try S
+      if (isInField( x, y+1)) neighboursFound.add( new FieldCoordinate(x, y+1));
+
+      // try SE
+      if (isInField( x+1, y+1)) neighboursFound.add( new FieldCoordinate(x+1, y+1));
+
+      return neighboursFound;
+   }
+
+   private boolean isInField( int x, int y) {
+      return getField(x, y) != null;
+
+   }
+
 
    public String toString() {
       StringBuilder build = new StringBuilder();
