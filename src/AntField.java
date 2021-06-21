@@ -16,7 +16,7 @@ public class AntField {
 
     public static final int FREE = 0;
 
-    private Field[][] fields;
+    private volatile Field[][] fields;
 
     /**
      * Uses {@code int} values to instantiate a new {@code AntField}. The columns
@@ -85,7 +85,7 @@ public class AntField {
      *    "Ist ein Feld als frei gekennzeichnet oder
      *      die dort eingetragene Schrittzahl grösser als die Schrittzahl der Ameise plus eins."
      *
-     * We blindly try all 8 possible fields - using the {@see isInField(newX, newY)} method.
+     * We blindly try all 8 possible fields, starting NW clockwise.
      *
      * @param x x-axis value of
      * @param y
@@ -93,34 +93,36 @@ public class AntField {
      * @return the moore-neighbours of this field
      */
     public ArrayList<FieldCoordinate> validMooreNeighbours(int x, int y, int stepCount) {
-        ArrayList<FieldCoordinate> neighboursFound = new ArrayList<>();
+        synchronized (fields) {
+            ArrayList<FieldCoordinate> neighboursFound = new ArrayList<>();
 
-        int valueThreshold = stepCount + 1;
+            int valueThreshold = stepCount + 1;
 
-        // P is our current position
-        //        0 | 1 |  2
-        //  0 |  NW | N | NE
-        //  1 |   W | P |  E
-        //  2 |  SW | S | SE
+            // P is our current position
+            //        0 | 1 |  2
+            //  0 |  NW | N | NE
+            //  1 |   W | P |  E
+            //  2 |  SW | S | SE
 
-        // try NW (x-1, y-1)
-        addNeighbourIfValidField(x - 1, y - 1, neighboursFound, valueThreshold);
-        // try N (x, y-1)
-        addNeighbourIfValidField(x, y - 1, neighboursFound, valueThreshold);
-        // try NE (x+1, y-1)
-        addNeighbourIfValidField(x + 1, y - 1, neighboursFound,valueThreshold);
-        // try W
-        addNeighbourIfValidField(x - 1, y, neighboursFound,valueThreshold);
-        // try E
-        addNeighbourIfValidField(x + 1, y, neighboursFound,valueThreshold);
-        // try SW
-        addNeighbourIfValidField(x - 1, y + 1, neighboursFound,valueThreshold);
-        // try S
-        addNeighbourIfValidField(x, y + 1, neighboursFound,valueThreshold);
-        // try SE
-        addNeighbourIfValidField(x + 1, y + 1, neighboursFound,valueThreshold);
+            // try NW (x-1, y-1)
+            addNeighbourIfValidField(x - 1, y - 1, neighboursFound, valueThreshold);
+            // try N (x, y-1)
+            addNeighbourIfValidField(x, y - 1, neighboursFound, valueThreshold);
+            // try NE (x+1, y-1)
+            addNeighbourIfValidField(x + 1, y - 1, neighboursFound, valueThreshold);
+            // try W
+            addNeighbourIfValidField(x - 1, y, neighboursFound, valueThreshold);
+            // try E
+            addNeighbourIfValidField(x + 1, y, neighboursFound, valueThreshold);
+            // try SW
+            addNeighbourIfValidField(x - 1, y + 1, neighboursFound, valueThreshold);
+            // try S
+            addNeighbourIfValidField(x, y + 1, neighboursFound, valueThreshold);
+            // try SE
+            addNeighbourIfValidField(x + 1, y + 1, neighboursFound, valueThreshold);
 
-        return neighboursFound;
+            return neighboursFound;
+        }
     }
 
     private void addNeighbourIfValidField(int x, int y, ArrayList<FieldCoordinate> neighboursFound, int threshold) {
@@ -162,7 +164,7 @@ public class AntField {
             build.append(String.format("%-2s|", i));
 
             for (int j = 0; j < maxlength; j++) {
-                if (i >= this.fields.length || i < 0 || j >= this.fields[i].length
+                if (i >= this.fields.length || j >= this.fields[i].length
                         || j < 0) {
                     build.append("##");
                 } else {
@@ -226,7 +228,7 @@ public class AntField {
             }
             if (this.value != FREE && value > this.value) {
                 throw new IllegalArgumentException(
-                        "cannot only set to a greater value of the value of this Field is set to FREE (value is "
+                        "cannot set field to a greater value of this Field (value is "
                                 + this.value + " and shall be set to " + value + ")");
 
             }

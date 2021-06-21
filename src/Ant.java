@@ -62,7 +62,7 @@ public class Ant implements Runnable {
 
         // Set the stepCount on the current field on this.stepCount
         this.fields.getField(this.x, this.y).setValue(this.stepCount);
-        System.out.println("Field value set by ant" + this.x + ":" + this.y);
+        //System.out.format("   constructed ant %d:%d set field value to %d\n", this.x, this.y, stepCount);
 
     }
 
@@ -73,13 +73,20 @@ public class Ant implements Runnable {
      * @param x the new x-pos
      * @param y the new y-pos
      */
-    public void setPos(int x, int y) {
-        synchronized ( fields ) {
-            System.out.println("called by ant " + startX + ":" + startY);
+    public void walkToNewPositionAndIncrementStepcount(int x, int y) {
+        synchronized (fields) {
+            //System.out.format("Ant %d:%d walks to %d:%d with stepcount=%d \n", startX, startY, x, y, stepCount);
             this.x = x;
             this.y = y;
             this.stepCount++;
-            fields.getField(x, y).setValue(stepCount);
+            try {
+                fields.getField(x, y).setValue(stepCount);
+            }
+            catch (IllegalArgumentException iae) {
+                System.out.format( "==== damned error in %d:%d", x,y);
+            }
+            //printAntStatus();
+
         }
     }
 
@@ -90,7 +97,7 @@ public class Ant implements Runnable {
      * @param y the y pos of the field to check
      * @return True if field is free or has greater value than this.stepCount, False otherwise
      */
-    public synchronized boolean checkField(int x, int y) {
+    public synchronized boolean isValidFieldToWalkOn(int x, int y) {
         int value = fields.getField(x, y).getValue();
 
         return (value == 0 || value > this.stepCount + 1);
@@ -106,7 +113,7 @@ public class Ant implements Runnable {
 
         boolean allNeighborsFalse = true;
         for (int i = 0; i < neighbors.size(); i++) {
-            if (checkField(neighbors.get(i).getX(), neighbors.get(i).getY())) {
+            if (isValidFieldToWalkOn(neighbors.get(i).getX(), neighbors.get(i).getY())) {
                 allNeighborsFalse = false;
             }
         }
@@ -115,57 +122,10 @@ public class Ant implements Runnable {
     }
 
 
-    /**
-     * Single iteration of finding + moving to neighbors
-     */
-    public void oneRun() {
-        // Case: Neighbors is empty, then this ant stops and is finished. We can leave this blank, as we do nothing!
+    private synchronized void printAntStatus() {
 
-
-
-        // Case: Neighbors_length is >=1: Move to first neighbor, start new ants for all others
-        if (neighbors.size() >= 1) {
-            int neighbourX = neighbors.get(0).getX();
-            int neighbourY = neighbors.get(0).getY();
-
-            // move THIS ant to first neighbour
-            if (checkField(neighbourX, neighbourY)) {
-                this.setPos(neighbourX, neighbourY);
-            }
-
-            // Iterate through all others neighbors and start new ant-threads
-            for (int i = 1; i < neighbors.size(); i++) {
-                neighbourX = neighbors.get(i).getX();
-                neighbourY = neighbors.get(i).getY();
-
-                if (checkField(neighbourX, neighbourY)) {
-                    System.out.println("New ant at neighbor" + neighbourX + ":" + neighbourY);
-                    Ant ant = new Ant(this.fields, neighbourX, neighbourY, this.stepCount);
-                    ant.walk();
-                    Thread thread = new Thread(ant);
-                    thread.start();
-
-//               try {
-//                  thread.join();
-//               } catch (InterruptedException e) {
-//                  e.printStackTrace();
-//               }
-                }
-            }
-        }
-
-
-    }
-
-    private void walk(){
-        this.stepCount++;
-    }
-
-    private void antStatus() {
-        synchronized( fields) {
-            System.out.println("Ant " + startX + "/" + startY + ":" + neighbors.size() + " neighbours, current pos: " + x + "/" + y + " stepCount " + stepCount);
-            System.out.println( fields);
-        }
+        System.out.format("Status: Ant %d:%d, stepCount %d has %d neighbours, currentPos %d:%d %s\n%s",
+                startX, startY, stepCount, neighbors.size(), x, y, neighbors, fields);
     }
 
     /**
@@ -174,9 +134,49 @@ public class Ant implements Runnable {
     public void run() {
         while (!finished()) {
             // for debugging purpuses - print this ants' status
-            antStatus();
-            this.oneRun();
+            printAntStatus();
+
+            // nicer code with Iterator... but leave that for another day
+            // Iterator currentNeighbours = neighbors.iterator();
+
+            // if we have at least one neighbour...
+            if (neighbors.size() >= 1) {
+
+                // move THIS ant to first neighbour,
+                // and increment its stepcount
+                int neighbourX = neighbors.get(0).getX();
+                int neighbourY = neighbors.get(0).getY();
+
+                // don't need to check for valid field here, as that's already done
+                // in validMooreNeighbours()
+                if (isValidFieldToWalkOn(neighbourX, neighbourY))
+                    walkToNewPositionAndIncrementStepcount(neighbourX, neighbourY);
+
+                //System.out.format("...ant %d:%d from pos %d:%d will create %d new ants at %s \n",
+                //        x, y, startX, startY, neighbors.size() - 1, neighbors);
+
+                // Iterate through all others neighbors and start new ant-threads
+
+                synchronized (fields) {
+                    for (int i = 1; i < neighbors.size(); i++) {
+                        neighbourX = neighbors.get(i).getX();
+                        neighbourY = neighbors.get(i).getY();
+
+                        if (isValidFieldToWalkOn(neighbourX, neighbourY)) {
+                            System.out.format("New ant starting at field %d:%d with stepcount %d \n", neighbourX, neighbourY, stepCount);
+                            Ant ant = new Ant(this.fields, neighbourX, neighbourY, this.stepCount);
+                            Thread thread = new Thread(ant);
+                            thread.start();
+                        }
+                    }
+                } // synchronized
+            }
+            // we have no neighbour and need to wait for the other threads...
+            else {
+                // FIXME: wait for other threads...
+            }
         }
+
     }
 
 }

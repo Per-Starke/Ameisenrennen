@@ -21,4 +21,7 @@ public class FieldCoordinate {
         return y;
     }
 
+    public String toString() {
+        return String.format("%d:%d",x,y);
+    }
 }

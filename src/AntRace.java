@@ -2,23 +2,32 @@ package src;
 
 public class AntRace implements AntFields {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		AntField field = new AntField(FIELD10);
+        //processField(new AntField(FIELD11), 0,1);
 
-		Ant ant = new Ant(field, 0, 0, 1);
+        //processField( new AntField(FIELD9), 1,1);
+        processField(new AntField(FIELD4), 2, 4);
 
-		Thread thread = new Thread(ant);
+    }
 
-		thread.start();
+    public static void processField(AntField field, int startX, int startY) {
+        System.out.println("\n\n\n===== starting =====\n");
+        System.out.println(field);
 
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+        Ant ant = new Ant(field, startX, startY, 1);
+
+        Thread thread = new Thread(ant);
+
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
-		System.out.println(field.toString());
-	}
+        System.out.println(field);
+    }
 }
