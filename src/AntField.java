@@ -80,45 +80,59 @@ public class AntField {
 
     /**
      * Returns a list of neighbours of the field at {@code x}, {@code y}.
-     * A field is a neighbour if it is >= 0.
+     * A field is a valid neighbour if:
+     *
+     *    "Ist ein Feld als frei gekennzeichnet oder
+     *      die dort eingetragene Schrittzahl grösser als die Schrittzahl der Ameise plus eins."
+     *
      * We blindly try all 8 possible fields - using the {@see isInField(newX, newY)} method.
      *
      * @param x x-axis value of
      * @param y
+     * @param stepCount the current stepCount of the calling ant
      * @return the moore-neighbours of this field
      */
-    public ArrayList<FieldCoordinate> mooreNeighbours(int x, int y, int stepCount) {
+    public ArrayList<FieldCoordinate> validMooreNeighbours(int x, int y, int stepCount) {
         ArrayList<FieldCoordinate> neighboursFound = new ArrayList<>();
 
-        // P is our current positition
+        int valueThreshold = stepCount + 1;
+
+        // P is our current position
         //        0 | 1 |  2
         //  0 |  NW | N | NE
         //  1 |   W | P |  E
         //  2 |  SW | S | SE
 
         // try NW (x-1, y-1)
-        addNeighbourIfValidField(x - 1, y - 1, neighboursFound);
+        addNeighbourIfValidField(x - 1, y - 1, neighboursFound, valueThreshold);
         // try N (x, y-1)
-        addNeighbourIfValidField(x, y - 1, neighboursFound);
+        addNeighbourIfValidField(x, y - 1, neighboursFound, valueThreshold);
         // try NE (x+1, y-1)
-        addNeighbourIfValidField(x + 1, y - 1, neighboursFound);
+        addNeighbourIfValidField(x + 1, y - 1, neighboursFound,valueThreshold);
         // try W
-        addNeighbourIfValidField(x - 1, y, neighboursFound);
+        addNeighbourIfValidField(x - 1, y, neighboursFound,valueThreshold);
         // try E
-        addNeighbourIfValidField(x + 1, y, neighboursFound);
+        addNeighbourIfValidField(x + 1, y, neighboursFound,valueThreshold);
         // try SW
-        addNeighbourIfValidField(x - 1, y + 1, neighboursFound);
+        addNeighbourIfValidField(x - 1, y + 1, neighboursFound,valueThreshold);
         // try S
-        addNeighbourIfValidField(x, y + 1, neighboursFound);
+        addNeighbourIfValidField(x, y + 1, neighboursFound,valueThreshold);
         // try SE
-        addNeighbourIfValidField(x + 1, y + 1, neighboursFound);
+        addNeighbourIfValidField(x + 1, y + 1, neighboursFound,valueThreshold);
 
         return neighboursFound;
     }
 
-    private void addNeighbourIfValidField(int x, int y, ArrayList<FieldCoordinate> neighboursFound) {
-        if (getField(x, y) != null)
-            neighboursFound.add(new FieldCoordinate(x, y));
+    private void addNeighbourIfValidField(int x, int y, ArrayList<FieldCoordinate> neighboursFound, int threshold) {
+        int fieldValue;
+
+        if (getField(x, y) != null) {
+
+            fieldValue = getField(x, y).getValue();
+
+            if ((fieldValue == FREE) || (fieldValue > threshold))
+                neighboursFound.add(new FieldCoordinate(x, y));
+        }
     }
 
 
@@ -206,7 +220,7 @@ public class AntField {
          * @param value the new value, must be >= 0
          * @throws IllegalArgumentException if {@code value} is <= 0
          */
-        public void setValue(int value) {
+        public synchronized void setValue(int value) {
             if (value <= 0) {
                 throw new IllegalArgumentException("cannot set value to <= 0");
             }

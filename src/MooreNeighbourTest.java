@@ -23,7 +23,7 @@ public class MooreNeighbourTest {
         testField = new AntField(AntFields.FIELD6);
         // public final int[][] FIELD6 = {{0}};
 
-        neighbours = testField.mooreNeighbours(0, 0);
+        neighbours = testField.validMooreNeighbours(0, 0, 1);
 
         if (neighbours == null) return false;
         if (neighbours.size() == 0) return true;
@@ -34,7 +34,7 @@ public class MooreNeighbourTest {
     public static boolean squareWithThreeNeighbours() {
         testField = new AntField(AntFields.FIELD7);
 
-        neighbours = testField.mooreNeighbours(0, 0);
+        neighbours = testField.validMooreNeighbours(0, 0, 1);
 
         if (neighbours == null) return false;
         else if (neighbours.size() == 3) return true;
@@ -45,7 +45,7 @@ public class MooreNeighbourTest {
         testField = new AntField(AntFields.FIELD8);
         // FIELD8 = {{0, 0, 0 }};
 
-        neighbours = testField.mooreNeighbours(0, 0);
+        neighbours = testField.validMooreNeighbours(0, 0, 1);
 
         if (neighbours == null) return false;
         else if (neighbours.size() == 1) return true;
@@ -56,7 +56,7 @@ public class MooreNeighbourTest {
         testField = new AntField(AntFields.FIELD8);
         // FIELD8 = {{0, 0, 0 }};
 
-        neighbours = testField.mooreNeighbours(1, 0);
+        neighbours = testField.validMooreNeighbours(1, 0, 1);
 
         if (neighbours == null) return false;
         else if (neighbours.size() == 2) return true;

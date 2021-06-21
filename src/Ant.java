@@ -74,7 +74,7 @@ public class Ant implements Runnable {
      * @param y the new y-pos
      */
     public void setPos(int x, int y) {
-        synchronized (this.getClass()) {
+        synchronized ( fields ) {
             System.out.println("called by ant " + startX + ":" + startY);
             this.x = x;
             this.y = y;
@@ -102,7 +102,7 @@ public class Ant implements Runnable {
      * @return True if this ant has no neighbors or all neighbors are "false" by the checkField method
      */
     private boolean finished() {
-        neighbors = fields.mooreNeighbours(this.x, this.y);
+        neighbors = fields.validMooreNeighbours(this.x, this.y, this.stepCount);
 
         boolean allNeighborsFalse = true;
         for (int i = 0; i < neighbors.size(); i++) {
@@ -162,7 +162,7 @@ public class Ant implements Runnable {
     }
 
     private void antStatus() {
-        synchronized(this.getClass()) {
+        synchronized( fields) {
             System.out.println("Ant " + startX + "/" + startY + ":" + neighbors.size() + " neighbours, current pos: " + x + "/" + y + " stepCount " + stepCount);
             System.out.println( fields);
         }
