@@ -24,7 +24,7 @@ public class Ant implements Runnable {
     /**
      * The fields / world this ant is s
      */
-    private AntField fields;
+    private volatile AntField fields;
 
     /**
      * The x and y position of this ant in the fields / world
@@ -102,10 +102,12 @@ public class Ant implements Runnable {
      * @param y the y pos of the field to check
      * @return True if field is free or has greater value than this.stepCount, False otherwise
      */
-    public synchronized boolean isValidFieldToWalkOn(int x, int y) {
-        int value = fields.getField(x, y).getValue();
+    public boolean isValidFieldToWalkOn(int x, int y) {
+        synchronized (fields) {
+            int value = fields.getField(x, y).getValue();
 
-        return (value == 0 || value > this.stepCount + 1);
+            return (value == 0 || value > this.stepCount + 1);
+        }
     }
 
     /**
@@ -158,7 +160,7 @@ public class Ant implements Runnable {
                     synchronized (fields) {
                         if (isValidFieldToWalkOn(neighbor_x, neighbor_y))
 
-                           // System.out.println("Test");
+                            // System.out.println("Test");
 
                             // If the ant has not walked yet, walk there
                             if (!this_ant_walked_to_neighbor) {
