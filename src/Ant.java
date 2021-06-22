@@ -106,7 +106,7 @@ public class Ant implements Runnable {
         synchronized (fields) {
             int value = fields.getField(x, y).getValue();
 
-            return (value == 0 || value > this.stepCount + 1);
+            return (value == 0 || value > this.stepCount );
         }
     }
 
@@ -183,7 +183,7 @@ public class Ant implements Runnable {
             // otherwise DEADLOCK
             for (Thread myAntThread : localAntThreads) {
                 try {
-                    System.out.format("Joining %s", myAntThread);
+                    System.out.format("Ant %d:%d joining %s\n", startX,startY, myAntThread);
                     myAntThread.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
