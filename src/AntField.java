@@ -92,7 +92,6 @@ public class AntField {
      * @return the moore-neighbours of this field
      */
     public ArrayList<FieldCoordinate> mooreNeighbours(int x, int y) {
-        synchronized (fields) {
             ArrayList<FieldCoordinate> neighboursFound = new ArrayList<>();
 
             // P is our current position
@@ -120,7 +119,6 @@ public class AntField {
 
             return neighboursFound;
         }
-    }
 
     private void addNeighbourIfValidField(int x, int y, ArrayList<FieldCoordinate> neighboursFound) {
         if (getField(x, y) != null) {

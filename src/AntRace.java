@@ -10,9 +10,9 @@ public class AntRace implements AntFields {
         //processField(new AntField(FIELD11), 0,1);
 
         //processField( new AntField(FIELD9), 1,1);
-        //processField(new AntField(FIELD4), 2, 4);
-        processField(new AntField(FIELD5), 2, 1);
-        processField(new AntField(FIELD6), 0, 0);
+         processField(new AntField(FIELD4), 2, 4);
+         // processField(new AntField(FIELD5), 2, 1);
+         //processField(new AntField(FIELD6), 0, 0);
 
     }
 

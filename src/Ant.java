@@ -24,7 +24,7 @@ public class Ant implements Runnable {
     /**
      * The fields / world this ant is s
      */
-    private static volatile AntField fields;
+    private volatile AntField fields;
 
     /**
      * The x and y position of this ant in the fields / world
@@ -32,6 +32,9 @@ public class Ant implements Runnable {
     private int x;
     private int y;
 
+    /**
+     * Start-position of the ant, to identify it in debugging-outpuut
+     */
     private int startX;
     private int startY;
 
@@ -63,13 +66,11 @@ public class Ant implements Runnable {
         this.startY = y;
 
         // Set the stepCount on the current field on this.stepCount
-        if (this.fields.getField(this.x, this.y) != null) {
-            this.fields.getField(this.x, this.y).setValue(this.stepCount);
-            System.out.format("Field value set to %d ", this.stepCount);
+        this.fields.getField(this.x, this.y).setValue(this.stepCount);
+        System.out.format("Field value set to %d ", this.stepCount);
         }
-        //System.out.format("   constructed ant %d:%d set field value to %d\n", this.x, this.y, stepCount);
 
-    }
+
 
     /**
      * Set the position of this ant to a new position.
@@ -90,8 +91,6 @@ public class Ant implements Runnable {
             } catch (IllegalArgumentException iae) {
                 System.out.format("==== damned error in %d:%d", x, y);
             }
-            //printAntStatus();
-
         }
     }
 
@@ -113,7 +112,7 @@ public class Ant implements Runnable {
     /**
      * Is this ant finished or should it continue taking steps?
      *
-     * @return True if this ant has no neighbors or all neighbors are "false" by the checkField method
+     * @return True if this ant has no neighbors or all neighbors are "false" by the isValidFieldToWalkOn method
      */
     private synchronized boolean finished() {
         neighbors = fields.mooreNeighbours(this.x, this.y);
@@ -130,7 +129,6 @@ public class Ant implements Runnable {
 
 
     private void printAntStatus() {
-
         System.out.format("Status: Ant %d:%d, stepCount %d has %d neighbours, currentPos %d:%d %s\n%s",
                 startX, startY, stepCount, neighbors.size(), x, y, neighbors, fields);
     }
@@ -142,9 +140,6 @@ public class Ant implements Runnable {
         while (!finished()) {
             // for debugging purposes - print this ants' status
             printAntStatus();
-
-            // nicer code with Iterator... but leave that for another day
-            // Iterator currentNeighbours = neighbors.iterator();
 
 
             // If we have at least one neighbor
