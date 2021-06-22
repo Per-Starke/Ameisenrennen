@@ -1,13 +1,16 @@
 package src;
 
+import java.util.ArrayList;
+
 public class AntRace implements AntFields {
+
 
     public static void main(String[] args) {
 
         //processField(new AntField(FIELD11), 0,1);
 
         //processField( new AntField(FIELD9), 1,1);
-        processField(new AntField(FIELD4), 2, 4);
+        processField(new AntField(FIELD11), 0, 0);
 
     }
 
@@ -26,7 +29,6 @@ public class AntRace implements AntFields {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
 
         System.out.println(field);
     }

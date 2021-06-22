@@ -87,16 +87,13 @@ public class AntField {
      *
      * We blindly try all 8 possible fields, starting NW clockwise.
      *
-     * @param x x-axis value of
-     * @param y
-     * @param stepCount the current stepCount of the calling ant
+     * @param x x-axis value of position
+     * @param y y-axis value of position
      * @return the moore-neighbours of this field
      */
-    public ArrayList<FieldCoordinate> validMooreNeighbours(int x, int y, int stepCount) {
+    public ArrayList<FieldCoordinate> mooreNeighbours(int x, int y) {
         synchronized (fields) {
             ArrayList<FieldCoordinate> neighboursFound = new ArrayList<>();
-
-            int valueThreshold = stepCount + 1;
 
             // P is our current position
             //        0 | 1 |  2
@@ -105,35 +102,29 @@ public class AntField {
             //  2 |  SW | S | SE
 
             // try NW (x-1, y-1)
-            addNeighbourIfValidField(x - 1, y - 1, neighboursFound, valueThreshold);
+            addNeighbourIfValidField(x - 1, y - 1, neighboursFound);
             // try N (x, y-1)
-            addNeighbourIfValidField(x, y - 1, neighboursFound, valueThreshold);
+            addNeighbourIfValidField(x, y - 1, neighboursFound);
             // try NE (x+1, y-1)
-            addNeighbourIfValidField(x + 1, y - 1, neighboursFound, valueThreshold);
+            addNeighbourIfValidField(x + 1, y - 1, neighboursFound);
             // try W
-            addNeighbourIfValidField(x - 1, y, neighboursFound, valueThreshold);
+            addNeighbourIfValidField(x - 1, y, neighboursFound);
             // try E
-            addNeighbourIfValidField(x + 1, y, neighboursFound, valueThreshold);
+            addNeighbourIfValidField(x + 1, y, neighboursFound);
             // try SW
-            addNeighbourIfValidField(x - 1, y + 1, neighboursFound, valueThreshold);
+            addNeighbourIfValidField(x - 1, y + 1, neighboursFound);
             // try S
-            addNeighbourIfValidField(x, y + 1, neighboursFound, valueThreshold);
+            addNeighbourIfValidField(x, y + 1, neighboursFound);
             // try SE
-            addNeighbourIfValidField(x + 1, y + 1, neighboursFound, valueThreshold);
+            addNeighbourIfValidField(x + 1, y + 1, neighboursFound);
 
             return neighboursFound;
         }
     }
 
-    private void addNeighbourIfValidField(int x, int y, ArrayList<FieldCoordinate> neighboursFound, int threshold) {
-        int fieldValue;
-
+    private void addNeighbourIfValidField(int x, int y, ArrayList<FieldCoordinate> neighboursFound) {
         if (getField(x, y) != null) {
-
-            fieldValue = getField(x, y).getValue();
-
-            if ((fieldValue == FREE) || (fieldValue > threshold))
-                neighboursFound.add(new FieldCoordinate(x, y));
+            neighboursFound.add(new FieldCoordinate(x, y));
         }
     }
 
